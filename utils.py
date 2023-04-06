@@ -1,16 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from params import *
 
 
-def plot_trajectory(predicted_x=None, gt_x=None, T=1, crop_y=False):
-    """
-    Plots the ground truth trajectory vs the predicted trajectory on a (t, x) plot.
-        :param predicted_x: Regularly spaced samples of the predicted trajectory. If None, this trajectory is not plotted.
-        :type predicted_x: np.ndarray[float], optional
-        :param gt_x: Regularly spaced samples of the ground truth trajectory. If None, this trajectory is not plotted.
-        :type gt_x: np.ndarray[float], optional
-        :param float|int T: Time horizon.
-        :param bool crop_y: If True, crop the y axis to zoom on [-1, 0].
+def plot_trajectory(predicted_x=None, gt_x=None, crop_y=False):
+    """Plots the ground truth trajectory vs the predicted trajectory on a (t, x) plot.
+    
+    :param predicted_x: Regularly spaced samples of the predicted trajectory. If None, this trajectory is not plotted.
+    :type predicted_x: np.ndarray[float], optional
+    :param gt_x: Regularly spaced samples of the ground truth trajectory. If None, this trajectory is not plotted.
+    :type gt_x: np.ndarray[float], optional
+    :param bool crop_y: If True, crop the y axis to zoom on [-1, 0].
     """
     plt.figure()
     if predicted_x is not None:
@@ -30,13 +30,12 @@ def plot_trajectory(predicted_x=None, gt_x=None, T=1, crop_y=False):
 
 
 def plot_control(predicted_u=None, gt_u=None,  T=1):
-    """
-    Plots the ground truth control vs the predicted control on a (t, u) plot.
-        :param predicted_u: Regularly spaced samples of the predicted control. If None, this control is not plotted.
-        :type predicted_u: np.ndarray[float], optional
-        :param gt_u: Regularly spaced samples of the ground truth control. If None, this control is not plotted.
-        :type gt_u: np.ndarray[float], optional
-        :param float|int T: Time horizon.
+    """Plots the ground truth control vs the predicted control on a (t, u) plot.
+    
+    :param predicted_u: Regularly spaced samples of the predicted control. If None, this control is not plotted.
+    :type predicted_u: np.ndarray[float], optional
+    :param gt_u: Regularly spaced samples of the ground truth control. If None, this control is not plotted.
+    :type gt_u: np.ndarray[float], optional
     """
     plt.figure()
     if predicted_u is not None:

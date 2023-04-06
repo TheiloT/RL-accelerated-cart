@@ -1,3 +1,6 @@
 .ipynb_checkpoints
 exports/**
 __pycache__
+TL-RL-toy-problem_files/
+TL-RL-toy-problem.md
+*.csl
