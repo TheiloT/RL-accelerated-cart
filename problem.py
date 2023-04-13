@@ -18,23 +18,23 @@ def cost(x, x_dot, u):
 # State dynamics of the system
 
 def  dynamics(x, v, u, dt=DT):
-    """Takes position and action ((x, v), a) and returns a new state x_new.
+    """Takes position and action ((x, v), u) and returns a new state x_new.
     
-    :param float x: Initial position.
-    :param float v: Initial velocity.
+    :param float x: Current position.
+    :param float v: Current velocity.
     :param float u: Action, considered cosntant on the integration time.
     :param float dt: Integration time.
-    :return (float, float): The new state x_new.
+    :return (float, float): New state x_new.
     """
     return x + dt*v + dt**2/(2*M_REAL)*u, v + dt/M_REAL*u
 
 def simulator(x_0, policy, dt=DT):
     """Run a simulation of the system between times 0 and T.
     
-    :param x_0: Initial positioni in [0, 1].
-    :policy function: Function that given a position and time returns an action.
-    :dt float: The integration time between two samples. 
-    :return: The triplet (x,  r) where x is the resulting trajectory, u the control and r the reward history, which are 3 np.arrays of size (N+1).
+    :param float x_0: Initial positioni in [0, 1].
+    :param function policy: Function that given a position and time returns an action.
+    :param float dt: The integration time between two samples. 
+    :return: The triplet (x, u, r) where x is the resulting trajectory, u the control and r the reward history, which are 3 np.arrays of size (N+1).
     """
     n_samples = int(T/dt)
     x = np.zeros(n_samples+1)
@@ -43,4 +43,5 @@ def simulator(x_0, policy, dt=DT):
     for n in range(n_samples):
         u = policy(n*dt, x[n])
         x[n+1], v = dynamics(x[n], v, u, dt=dt)
+    # fix the return lol
     return x

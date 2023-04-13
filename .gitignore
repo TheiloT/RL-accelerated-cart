@@ -3,4 +3,5 @@ exports/**
 __pycache__
 TL-RL-toy-problem_files/
 TL-RL-toy-problem.md
+TL-RL-toy-problem.pdf
 *.csl
