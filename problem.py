@@ -15,6 +15,7 @@ def cost(x, x_dot, u):
     return LAMBDA_P*x[-1]**2 + LAMBDA_V*x_dot[-1]**2 + np.trapz(u**2, dx=T/u.shape[0])
 
 
+
 # State dynamics of the system
 
 def  dynamics(x, v, u, dt=DT):
@@ -27,6 +28,7 @@ def  dynamics(x, v, u, dt=DT):
     :return (float, float): New state x_new.
     """
     return x + dt*v + dt**2/(2*M_REAL)*u, v + dt/M_REAL*u
+
 
 def simulator(x_0, policy, dt=DT):
     """Run a simulation of the system between times 0 and T.

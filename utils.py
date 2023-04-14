@@ -54,6 +54,37 @@ def plot_control(predicted_u=None, gt_u=None,  T=1):
     plt.show()
 
 
+def plot_V_x(V, v=0, state_zoom=None, colorbar_limits=None, zoom_time=0):
+    """Plots the value function on an (x, n) axis (where n is the time step) for a fixed velocity v.
+    
+    :param V: The value function to plot.
+    :type V: np.ndarray[float] of dimension N x ((X_R-X_L)*N_X+1) x ((V_R-V_L)*N_V+1).
+    :param float v: The fixed velocity at which to plot V.
+    :param np.ndarray[float] state_zoom: Values of V for states smaller or greater than the boundaries of this state window are not plotted. If None, takes the whole state space.
+    :param np.ndarray[float] colorbar_limits: Sets the min and max boundaries for the colorbar; values of V above these boundaries are capped to the nearest boundary.
+    :param int zoom_time: The distance between 2 ticks on the n axis is multiplied by 2^(zoom_time), to make the plot more readable. Otherwise, the plot might be too streched in x.
+    """
+    state_zoom = state_zoom if state_zoom else (0, V.shape[1]-1)
+    colorbar_limits = colorbar_limits if colorbar_limits else (None, None)
+    truncated_V = V[:,state_zoom[0]:state_zoom[1]+1, to_arr_v(v)]
+    truncated_V = np.expand_dims(truncated_V, axis=1)
+    for _ in range(zoom_time):
+        truncated_V = np.concatenate([truncated_V, truncated_V] , axis=1)
+    truncated_V = np.reshape(truncated_V, [truncated_V.shape[0]*truncated_V.shape[1], truncated_V.shape[2]])
+    plt.figure()
+    plt.imshow(truncated_V, vmin=colorbar_limits[0], vmax=colorbar_limits[1])
+    xticks = np.append(np.arange(0, truncated_V.shape[1], truncated_V.shape[1]//5), (to_arr_x(0)-state_zoom[0]))
+    plt.xticks(ticks=xticks, labels=[f"{x:.2f}" for x in from_arr_x(np.arange(state_zoom[0], state_zoom[1]+1, truncated_V.shape[1]//5))]+[0])
+    yticks = np.arange(0, truncated_V.shape[0]+1, truncated_V.shape[0]//2)
+    plt.yticks(ticks=yticks, labels=[n/(2**zoom_time) for n in yticks])
+    plt.colorbar(location="bottom")
+    plt.title("Value function")
+    plt.xlabel("x")
+    plt.ylabel("n")
+    plt.show()
+
+
+
 # Conversion from float to array indices
 
 def transform_interval(a, b, c, d, x):
