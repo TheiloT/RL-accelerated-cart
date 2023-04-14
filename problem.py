@@ -32,16 +32,16 @@ def simulator(x_0, policy, dt=DT):
     """Run a simulation of the system between times 0 and T.
     
     :param float x_0: Initial positioni in [0, 1].
-    :param function policy: Function that given a position and time returns an action.
+    :param function policy: Function that given a position, velocity and time returns an action.
     :param float dt: The integration time between two samples. 
-    :return: The triplet (x, u, r) where x is the resulting trajectory, u the control and r the reward history, which are 3 np.arrays of size (N+1).
+    :return: The couple (x, u) where x is the resulting trajectory and u the control which are 2 np.arrays of size (N+1) and (N) respectively, where N=T/dt.
     """
     n_samples = int(T/dt)
     x = np.zeros(n_samples+1)
+    u = np.zeros(n_samples)
     x[0] = x_0
     v = 0
     for n in range(n_samples):
-        u = policy(n*dt, x[n])
-        x[n+1], v = dynamics(x[n], v, u, dt=dt)
-    # fix the return lol
-    return x
+        u[n] = policy(n*dt, x[n], v)
+        x[n+1], v = dynamics(x[n], v, u[n], dt=dt)
+    return x, u
