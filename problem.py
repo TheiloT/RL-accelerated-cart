@@ -25,7 +25,7 @@ def  dynamics(x, v, u, dt=DT):
     :param float v: Current velocity.
     :param float u: Action, considered cosntant on the integration time.
     :param float dt: Integration time.
-    :return (float, float): New state x_new.
+    :return (float, float): New state and velocity.
     """
     return x + dt*v + dt**2/(2*M_REAL)*u, v + dt/M_REAL*u
 
