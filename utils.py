@@ -43,7 +43,9 @@ def plot_control(predicted_u=None, gt_u=None,  T=1):
     plt.figure()
     plt.grid()
     if predicted_u is not None:
-        t_prediction = np.linspace(0, T, predicted_u.shape[0])
+        # We should be careful about the fact that the last action is taken at the last step but one.
+        dt_prediction = T/predicted_u.shape[0]
+        t_prediction = np.linspace(0, T-dt_prediction, predicted_u.shape[0])
         plt.scatter(t_prediction, predicted_u, label="Prediction", color="tab:blue", marker="x")
     if gt_u is not None:
         t_gt = np.linspace(0, T, gt_u.shape[0])
@@ -85,11 +87,12 @@ def plot_V_x(V, v=0, state_zoom=None, colorbar_limits=None, zoom_time=0):
     plt.show()
 
 
-def plot_training_evaluations(log_folder, crop_reward=None):
+def plot_training_evaluations(log_folder, reference_reward=None, crop_reward=None):
     """Plots the evaluation scores obtained over training steps.
     An evaluation score is the average reward obtained by the RL agent over a number of runs that was chosen during training.
 
-    :param string log_folder: path to the folder containing the evaluation logs 
+    :param string log_folder: path to the folder containing the evaluation logs.
+    :param (float, optional) reference_reward: A reward used as a reference, typically the optimal reward in the worse case where x_0=-1. Defaults to None.
     :param (np.array(float, float), optional) crop_reward: Interval of reward values that will be shown on the y-axis. If None, it is set automatically to fit extremal values of the data. Defaults to None.
     """
     log = os.path.join(log_folder, "evaluations.npz")
@@ -100,6 +103,8 @@ def plot_training_evaluations(log_folder, crop_reward=None):
     plt.plot(timesteps, accumulated_rewards.mean(axis=1), label="mean")
     plt.fill_between(timesteps, accumulated_rewards.mean(axis=1) - accumulated_rewards.std(axis=1), accumulated_rewards.mean(axis=1) + accumulated_rewards.std(axis=1), alpha=0.4, label="std", color="gray")
     plt.fill_between(timesteps, accumulated_rewards.min(axis=1), accumulated_rewards.max(axis=1), alpha=0.2, label="min-max", color="gray")
+    if reference_reward is not None:
+        plt.plot([0, timesteps[-1]], [reference_reward, reference_reward], color="r", label="Reference reward")
     plt.title("Estimated average accumulated reward over training timesteps")
     plt.xlabel("Timesteps")
     plt.ylabel("Reward")
