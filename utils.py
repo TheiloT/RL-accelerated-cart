@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from params import *
@@ -84,6 +85,30 @@ def plot_V_x(V, v=0, state_zoom=None, colorbar_limits=None, zoom_time=0):
     plt.show()
 
 
+def plot_training_evaluations(log_folder, crop_reward=None):
+    """Plots the evaluation scores obtained over training steps.
+    An evaluation score is the average reward obtained by the RL agent over a number of runs that was chosen during training.
+
+    :param string log_folder: path to the folder containing the evaluation logs 
+    :param (np.array(float, float), optional) crop_reward: Interval of reward values that will be shown on the y-axis. If None, it is set automatically to fit extremal values of the data. Defaults to None.
+    """
+    log = os.path.join(log_folder, "evaluations.npz")
+    plt.figure("Evaluations during training")
+    evaluation_data = np.load(log)
+    timesteps = evaluation_data["timesteps"]
+    accumulated_rewards = evaluation_data["results"]
+    plt.plot(timesteps, accumulated_rewards.mean(axis=1), label="mean")
+    plt.fill_between(timesteps, accumulated_rewards.mean(axis=1) - accumulated_rewards.std(axis=1), accumulated_rewards.mean(axis=1) + accumulated_rewards.std(axis=1), alpha=0.4, label="std", color="gray")
+    plt.fill_between(timesteps, accumulated_rewards.min(axis=1), accumulated_rewards.max(axis=1), alpha=0.2, label="min-max", color="gray")
+    plt.title("Estimated average accumulated reward over training timesteps")
+    plt.xlabel("Timesteps")
+    plt.ylabel("Reward")
+    if crop_reward is not None:
+        plt.ylim(crop_reward)
+    plt.legend()
+    plt.grid()
+    plt.show()
+
 
 # Conversion from float to array indices
 
@@ -105,3 +130,35 @@ to_arr_v = lambda v: round(transform_interval(V_L, V_R, 0, (V_R-V_L)*N_V, v))  #
 from_arr_v = lambda v: transform_interval(0, (V_R-V_L)*N_V, V_L, V_R, v)  # Inverse of the previous
 to_arr_a = lambda a: round(transform_interval(U_L, U_R, 0, (U_R-U_L)*N_U, a))  # This is to convert an action to an index for value functions and policies
 from_arr_a = lambda a: transform_interval(0, (U_R-U_L)*N_U, U_L, U_R, a)  # Inverse of the previous
+
+
+# Function for storing RL models
+
+def replace_best_model(model_path):
+    """ When resuming the training of an RL model, this function is used to update the best stored 
+    model with the one obtained with the new training, if necessary.
+    """
+    previous_best_score = np.max(np.mean(np.load(os.path.join(model_path, "old_evaluations.npz"))["results"], axis=-1))
+    new_best_score = np.max(np.mean(np.load(os.path.join(model_path, "evaluations.npz"))["results"], axis=-1))
+    if new_best_score <= previous_best_score:
+        print("No improvement made from previous training.")
+        os.remove(os.path.join(model_path, "best_model.zip"))
+        os.rename(os.path.join(model_path, "old_best_model.zip"),os.path.join(model_path, "best_model.zip"))
+    else:
+        print("Improvement made from previous training.")
+        os.remove(os.path.join(model_path, "old_best_model.zip"))
+
+
+def merge_eval_logs(model_path):
+    """ When resuming the training of an RL model, this function is used to update the previous training logs
+    with the logs obtained from the new training.
+    """
+    old_evaluations = np.load(os.path.join(model_path, "old_evaluations.npz"))
+    new_evaluations = np.load(os.path.join(model_path, "evaluations.npz"))
+    np.savez(
+        os.path.join(model_path, "evaluations"),
+        timesteps=np.append(old_evaluations["timesteps"], new_evaluations["timesteps"]),
+        results=np.append(old_evaluations["results"], new_evaluations["results"], axis=0),
+        ep_lengths=np.append(old_evaluations["ep_lengths"], new_evaluations["ep_lengths"], axis=0)
+    )
+    os.remove(os.path.join(model_path, "old_evaluations.npz"))
