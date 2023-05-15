@@ -1,14 +1,12 @@
 # Physical problem
 M_REAL = 1      # Mass of the cart
 LAMBDA_P = 100  # Penalization for not reaching the target at time T
-LAMBDA_V = 50   # Penalization for not reaching the target at time T
+LAMBDA_V = 50   # Penalization for not having null velocity at time T
 T = 1           # Time horizon of the problem
 
 # Time discretization
-N = 50         # Number of time steps, common for: the simulator (by default);
-            # the data collection for model identification; the control obtained
-            # by traditional methods; the DP formulation; the RL formulation.
-DT = T/N        # Length of a time step
+N = 50    # Number of time steps for the simulator
+DT = T/N  # Length of a time step
 
 # Space and action discretizations
 U_L, U_R = -6, 6  # Bounds for the control
@@ -23,7 +21,7 @@ N_X = round(1/DX)  # Resolution of the position
 
 
 def print_current_parameters(physical_problem=True, time_discretization=False, space_action_discretizations=False):
-    """Print current global parameters for the program.
+    """ Prints current global parameters for the program.
 
     :param (bool, optional) physical_problem: Whether to print parameters for the physical problem. Defaults to True.
     :param (bool, optional) time_discretization: Whether to print parameters for discretization in time. Defaults to False.
@@ -59,7 +57,7 @@ def print_current_parameters(physical_problem=True, time_discretization=False, s
 
 
 def update_action_space_parameters(new_N_U=N_U, new_U_L=U_L, new_U_R=U_R):
-    """ Update the action (and space) parameters with a new value for U_L, U_R and N_U. """
+    """ Updates the action (and space) parameters with a new value for U_L, U_R and N_U. """
     global U_L, U_R, N_U, DU, V_L, V_R, DV, N_V, X_L, X_R, DX, N_X
     U_L, U_R = new_U_L, new_U_R
     N_U = new_N_U
@@ -73,7 +71,7 @@ def update_action_space_parameters(new_N_U=N_U, new_U_L=U_L, new_U_R=U_R):
 
 
 def update_time_parameters(new_N=N):
-    """ Update the time parameters with a new value for N. """
+    """ Updates the time parameters with a new value for N. """
     global N, DT
     N = new_N
     DT = T/N
@@ -81,7 +79,7 @@ def update_time_parameters(new_N=N):
 
 
 def update_physical_parameters(new_M_REAL=M_REAL, new_LAMBDA_P=LAMBDA_P, new_LAMBDA_V=LAMBDA_V, new_T=T):
-    """ Update the time parameters with a new value for N. """
+    """ Updates the time parameters with a new value for N. """
     global M_REAL, LAMBDA_P, LAMBDA_V, T
     M_REAL = new_M_REAL
     LAMBDA_P = new_LAMBDA_P

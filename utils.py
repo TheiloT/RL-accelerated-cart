@@ -8,13 +8,14 @@ import params as p
 # Plotting
 
 def plot_trajectory(predicted_x=None, gt_x=None, crop_y=False, title="position"):
-    """Plots the ground truth trajectory vs the predicted trajectory on a (t, x) plot.
+    """ Plots the ground truth trajectory vs the predicted trajectory on a (t, x) plot.
     
     :param predicted_x: Regularly spaced samples of the predicted trajectory. If None, this trajectory is not plotted.
     :type predicted_x: np.ndarray[float], optional
     :param gt_x: Regularly spaced samples of the ground truth trajectory. If None, this trajectory is not plotted.
     :type gt_x: np.ndarray[float], optional
     :param bool crop_y: If True, crop the y axis to zoom on [-1, 0].
+    :param string title: the type of trajectory that is plotted, as displayed in the title of the plot.
     """
     plt.figure()
     plt.grid()
@@ -34,7 +35,7 @@ def plot_trajectory(predicted_x=None, gt_x=None, crop_y=False, title="position")
 
 
 def plot_control(predicted_u=None, gt_u=None):
-    """Plots the ground truth control vs the predicted control on a (t, u) plot.
+    """ Plots the ground truth control vs the predicted control on a (t, u) plot.
     
     :param predicted_u: Regularly spaced samples of the predicted control. If None, this control is not plotted.
     :type predicted_u: np.ndarray[float], optional
@@ -59,7 +60,7 @@ def plot_control(predicted_u=None, gt_u=None):
 
 
 def plot_V_x(V, v=0, state_zoom=None, log_scale=True, zoom_time=0):
-    """Plots the value function on an (x, n) axis (where n is the time step) for a fixed velocity v.
+    """ Plots the value function on an (x, n) axis (where n is the time step) for a fixed velocity v.
     
     :param V: The value function to plot.
     :type V: np.ndarray[float] of dimension N x ((p.X_R-p.X_L)*p.N_X+1) x ((p.V_R-p.V_L)*p.N_V+1).
@@ -91,11 +92,11 @@ def plot_V_x(V, v=0, state_zoom=None, log_scale=True, zoom_time=0):
     
     
 def plot_V_v(V, x=0, state_zoom=None, log_scale=True, zoom_time=0):
-    """Plots the value function on an (x, n) axis (where n is the time step) for a fixed velocity v.
+    """ Plots the value function on an (v, n) axis (where n is the time step) for a fixed position x.
     
     :param V: The value function to plot.
     :type V: np.ndarray[float] of dimension N x ((p.X_R-p.X_L)*p.N_X+1) x ((p.V_R-p.V_L)*p.N_V+1).
-    :param float v: The fixed velocity at which to plot V.
+    :param float x: The fixed position at which to plot V.
     :param np.ndarray[float] state_zoom: Values of V for states smaller or greater than the boundaries of this state window are not plotted. If None, takes the whole state space.
     :param bool log_scale: Whether to use a log scale for the colorbar. Defaults to True.
     :param int zoom_time: The distance between 2 ticks on the n axis is multiplied by 2^(zoom_time), to make the plot more readable. Otherwise, the plot might be too streched in x.
@@ -123,7 +124,7 @@ def plot_V_v(V, x=0, state_zoom=None, log_scale=True, zoom_time=0):
 
 
 def plot_training_evaluations(log_folder, reference_reward=None, crop_reward=None):
-    """Plots the evaluation scores obtained over training steps.
+    """ Plots the evaluation scores obtained over training steps.
     An evaluation score is the average reward obtained by the RL agent over a number of runs that was chosen during training.
 
     :param string log_folder: path to the folder containing the evaluation logs.
@@ -153,7 +154,7 @@ def plot_training_evaluations(log_folder, reference_reward=None, crop_reward=Non
 # Conversion from float to array indices
 
 def transform_interval(a, b, c, d, x):
-    """Affine transformation that maps an interval [a, b] to an interval [c, d].
+    """ Affine transformation that maps an interval [a, b] to an interval [c, d].
     
     :param int a: Lower bound of the departure interval.
     :param int b: Upper bound of the departure interval.

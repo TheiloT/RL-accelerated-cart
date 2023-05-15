@@ -20,31 +20,20 @@ def  final_cost(x_N, v_N):
 
 # Reachable states for dynamic programming
 def reachable_x(t):
-    """Returns the set of positions that are reachable in time t from x_0 varying in [-1, 0].
-    This will be useful in dynamic programming for computing the value function only on relevant states.
-
-    :param t float: This function computes positions that can be reached in time t.
-    :return np.ndarray[float]: The array of positions that can be reached in time t.
-    """
+    """ Returns the set of positions that are reachable in time t from x_0 varying in [-1, 0].
+    Useful in dynamic programming for computing the value function only on relevant states. """
     return np.arange(-1 + p.U_L*(t**2)/(2*p.M_REAL), p.U_R*(t**2)/(2*p.M_REAL) + p.DX/2, p.DX)
 
 def reachable_v(t):
-    """Returns the set of velocities that are reachable in time t from a null velocity at time 0.
-    This will be useful in dynamic programming for computing the value function only on relevant states.
-
-    :param t float: This function computes velocities that can be reached in time t.
-    :return np.ndarray[float]: The array of velocities that can be reached in time t.
-    """
+    """ Returns the set of velocities that are reachable in time t from a null velocity at time 0.
+    Useful in dynamic programming for computing the value function only on relevant states. """
     return np.arange(p.U_L/p.M_REAL*t, p.U_R/p.M_REAL*t + p.DV/2, p.DV)
 
 
 # Reinforcement learning utilitaries
-# Function for storing RL models
-
 def replace_best_model(model_path):
     """ When resuming the training of an RL model, this function is used to update the best stored 
-    model with the one obtained with the new training, if necessary.
-    """
+    model with the one obtained with the new training, if necessary. """
     previous_best_score = np.max(np.mean(np.load(os.path.join(model_path, "old_evaluations.npz"))["results"], axis=-1))
     new_best_score = np.max(np.mean(np.load(os.path.join(model_path, "evaluations.npz"))["results"], axis=-1))
     if new_best_score <= previous_best_score:
@@ -58,8 +47,7 @@ def replace_best_model(model_path):
 
 def merge_eval_logs(model_path):
     """ When resuming the training of an RL model, this function is used to update the previous training logs
-    with the logs obtained from the new training.
-    """
+    with the logs obtained from the new training. """
     old_evaluations = np.load(os.path.join(model_path, "old_evaluations.npz"))
     new_evaluations = np.load(os.path.join(model_path, "evaluations.npz"))
     np.savez(
@@ -72,8 +60,7 @@ def merge_eval_logs(model_path):
 
 
 def instantiate_model(model_name, Algo, hyperparameters, n_envs=None, verbose=0):
-    """
-    Creates a folder for the RL model to be trained in the "Agents" folder. This folder will contain the model itself (architcture, weights; best model and latest model),
+    """ Creates a folder for the RL model to be trained in the "Agents" folder. This folder will contain the model itself (architecture, weights; best model and latest model),
     the parameters for the cart problem used, the hyperparameters used, monitoring logs for the training and logs for the evaluations made throughout training.
     If the folder already exists, this function simply reloads the existing model.
     
@@ -82,7 +69,7 @@ def instantiate_model(model_name, Algo, hyperparameters, n_envs=None, verbose=0)
     :type Algo: stable_baselines3 class for the agorithm. 
     :param dict hyperparameters: A dictionary containing the hyperparameters to use for the model.
     :param (int, optional) n_envs: The number of envs to use for parallelized training. If None, no parallelization is applied. Defaults to None.
-    :param (int, optional) verbose: If 1, will print info on the training process. If 0, trains silently. Defaults to 0.
+    :param (int, optional) verbose: If 1, will print info on the training process. If 0, only prints evaluation results throughout the training. Defaults to 0.
     :return: The model path, created/loaded model and env used for model instanciation.
     :rtype: string, Algo, gym.Env.
     """
@@ -118,7 +105,6 @@ def instantiate_model(model_name, Algo, hyperparameters, n_envs=None, verbose=0)
         with open(os.path.join(model_path, "problem.json"), "r") as problems_parameters_file:
             if current_problem_parameters != json.load(problems_parameters_file):
                 print("WARNING: The loaded model was trained for a different set of problem parameters!")
-            
         
     else:
         print("Creating a new model.")
@@ -143,6 +129,9 @@ def instantiate_model(model_name, Algo, hyperparameters, n_envs=None, verbose=0)
 
 
 def train_model(model, model_path, training_steps=50_000, eval_freq=500, n_envs=1):
+    """ Trains the specified model (name and path), running n_envs training episodes simultaneously.
+    Training stops after training_steps time steps have been simulated, counting each parallel episode independantly.
+    Evaluations are carried out every n_envs*eval_freq time steps, evaluating on 50 episodes. """
     old_eval_logs = os.path.exists(os.path.join(model_path, "evaluations.npz")) and os.path.exists(os.path.join(model_path, "best_model.zip"))
     assert os.path.exists(os.path.join(model_path, "best_model.zip")) == old_eval_logs and os.path.exists(os.path.join(model_path, "evaluations.npz")) == old_eval_logs
     if old_eval_logs:
